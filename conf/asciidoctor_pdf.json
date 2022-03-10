@@ -1,0 +1,9 @@
+
+{
+    "backend":"pdf",
+    "safe":"unsafe",
+    "header_footer":true,
+    "converter": "ASCIIDOCTOR",
+    "attributes":{
+    }
+}
