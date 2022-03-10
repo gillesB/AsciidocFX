@@ -11,11 +11,13 @@ import org.springframework.stereotype.Component;
 
 import com.dooapp.fxform.FXForm;
 import com.dooapp.fxform.builder.FXFormBuilder;
+import com.dooapp.fxform.filter.ExcludeFilter;
 import com.kodedu.config.AsciidoctorConfigBase.LoadedAttributes;
 import com.kodedu.config.PdfConfigBean.PdfConfigAttributes;
 import com.kodedu.controller.ApplicationController;
 import com.kodedu.service.ThreadService;
 
+import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.SimpleObjectProperty;
 
@@ -31,7 +33,9 @@ public class PdfConfigBean extends AsciidoctorConfigBase<PdfConfigAttributes> {
 
     private ObjectProperty<PdfConverterType> converter = new SimpleObjectProperty<>(PdfConverterType.FOP);
 
-    @Override
+    private final ExcludeFilter attributeExclusion = new ExcludeFilter("attributes");
+
+	@Override
     public String formName() {
         return "PDF Settings";
     }
@@ -68,17 +72,19 @@ public class PdfConfigBean extends AsciidoctorConfigBase<PdfConfigAttributes> {
 	protected void addAdditionalAttributesToJson(JsonObjectBuilder objectBuilder) {
 		objectBuilder.add("converter", getPdfConverterType().name());
 	}
-	
-	@Override
-    public FXForm getConfigForm() {
-        FXForm configForm = new FXFormBuilder<>()
-                .resourceBundle(ResourceBundle.getBundle("asciidoctorConfig"))
-                .includeAndReorder(
-                        "converter",
-                        "attributes").build();
 
-        return configForm;
-    }
+	@Override
+	public FXForm getConfigForm() {
+		FXForm configForm = new FXFormBuilder<>().resourceBundle(ResourceBundle.getBundle("asciidoctorConfig"))
+		                                         .includeAndReorder("converter", "attributes")
+		                                         .build();
+
+		this.converter.addListener((obs, oldValue, newValue) -> {
+			performFilters(configForm, newValue);
+		});
+		performFilters(configForm, getPdfConverterType());
+		return configForm;
+	}
 
 	public PdfConverterType getPdfConverterType() {
         return converter.get();
@@ -95,7 +101,16 @@ public class PdfConfigBean extends AsciidoctorConfigBase<PdfConfigAttributes> {
 	}
     
     
-    static class PdfConfigAttributes implements LoadedAttributes {
+    private void performFilters(FXForm configForm, PdfConverterType type) {
+		if (PdfConverterType.ASCIIDOCTOR.equals(type)) {
+			Platform.runLater(() -> configForm.getFilters().remove(attributeExclusion));
+		} else {
+			Platform.runLater(() -> configForm.addFilters(attributeExclusion));
+		}
+	}
+
+
+	static class PdfConfigAttributes implements LoadedAttributes {
     	PdfConverterType converter;
     	
     	
