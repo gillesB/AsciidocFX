@@ -67,6 +67,7 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 			Attributes attributes = pdfConfigBean.getAsciiDocAttributes();
 
 			Asciidoctor doctor = Asciidoctor.Factory.create();
+			doctor.requireLibrary("asciidoctor-diagram");
 
 			Options options = Options.builder()
 			                         .baseDir(destFile.getParentFile())
