@@ -20,6 +20,8 @@ import com.kodedu.other.ExtensionFilters;
 import com.kodedu.service.DirectoryService;
 import com.kodedu.service.ThreadService;
 import com.kodedu.service.convert.DocumentConverter;
+import com.kodedu.service.extension.chart.FooBlockProcessor;
+import com.kodedu.service.extension.chart.FxChartBlockProcessor;
 import com.kodedu.service.ui.IndikatorService;
 
 /**
@@ -36,17 +38,20 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
     private final DirectoryService directoryService;
     private final Current current;
 	private final PdfConfigBean pdfConfigBean;
+	private final FxChartBlockProcessor fxChartBlockProcessor;
 
     @Autowired
     public AsciidoctorPdfBookConverter(final ApplicationController asciiDocController,
                             final IndikatorService indikatorService, final PdfConfigBean pdfConfigBean,
-                            final ThreadService threadService, final DirectoryService directoryService, final Current current) {
+                            final ThreadService threadService, final DirectoryService directoryService, final Current current,
+                            final FxChartBlockProcessor fxChartBlockProcessor) {
         this.asciiDocController = asciiDocController;
         this.indikatorService = indikatorService;
         this.threadService = threadService;
         this.directoryService = directoryService;
         this.current = current;
         this.pdfConfigBean = pdfConfigBean;
+        this.fxChartBlockProcessor = fxChartBlockProcessor;
     }
 
 
@@ -68,6 +73,8 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 
 			Asciidoctor doctor = Asciidoctor.Factory.create();
 			doctor.requireLibrary("asciidoctor-diagram");
+			doctor.javaExtensionRegistry().block(fxChartBlockProcessor);
+			doctor.javaExtensionRegistry().block(FooBlockProcessor.class);
 
 			Options options = Options.builder()
 			                         .baseDir(destFile.getParentFile())
