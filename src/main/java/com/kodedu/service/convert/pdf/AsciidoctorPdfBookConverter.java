@@ -69,8 +69,10 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 			indikatorService.startProgressBar();
 			logger.debug("PDF conversion started");
 			
+			SafeMode safe = convertSafe(pdfConfigBean.getSafe());
+			
 			Attributes attributes = pdfConfigBean.getAsciiDocAttributes();
-
+			
 			Asciidoctor doctor = Asciidoctor.Factory.create();
 			doctor.requireLibrary("asciidoctor-diagram");
 			doctor.javaExtensionRegistry().block(fxChartBlockProcessor);
@@ -80,7 +82,9 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 			                         .baseDir(destFile.getParentFile())
 			                         .toFile(destFile)
 			                         .backend("pdf")
-			                         .safe(SafeMode.UNSAFE)
+			                         .safe(safe)
+			                         .sourcemap(pdfConfigBean.getSourcemap())
+			                         .headerFooter(pdfConfigBean.getHeader_footer())
 			                         .attributes(attributes)
 			                         .build();
 			doctor.convert(asciidoc,
@@ -92,6 +96,17 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 			asciiDocController.addRemoveRecentList(pdfPath);
 
 		});
+	}
 
+	private SafeMode convertSafe(String safeStr) {
+		if (safeStr == null) {
+			return SafeMode.SAFE;
+		}
+		try {
+			return SafeMode.valueOf(safeStr.toUpperCase());
+		} catch (IllegalArgumentException ex) {
+			logger.error("Unkown safe mode! Will use SAFE.", ex);
+			return SafeMode.SAFE;
+		}
 	}
 }
