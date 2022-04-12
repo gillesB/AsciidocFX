@@ -60,7 +60,7 @@ public class AsciidoctorPdfBookConverter implements DocumentConverter<String> {
 
 		String asciidoc = current.currentEditorValue();
 
-		threadService.runActionLater(() -> {
+		threadService.runTaskLater(() -> {
 
 			final Path pdfPath = directoryService.getSaveOutputPath(ExtensionFilters.PDF, askPath);
 

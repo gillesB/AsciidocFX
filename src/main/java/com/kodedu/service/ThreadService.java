@@ -19,7 +19,12 @@ public interface ThreadService {
 
     public ScheduledFuture<?> scheduleWithDelay(Runnable runnable, long initialDelay, long delay, TimeUnit timeUnit);
 
-    // Runs Task in background thread pool
+    /**
+     * Runs Task in background thread pool
+     * @param <T>
+     * @param runnable
+     * @return
+     */
     public <T> Future<?> runTaskLater(Runnable runnable);
 
     /**
