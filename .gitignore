@@ -29,6 +29,9 @@ idea/
 *.iml
 *.iws
 
+.project
+.settings/
+
 # OSX
 .DS_Store
 
@@ -50,6 +53,3 @@ jmods/mac-jars/
 
 jars/
 
-# Eclipse #
-.project
-.settings/
