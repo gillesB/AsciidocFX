@@ -49,3 +49,7 @@ nashorn_code_cache
 jmods/mac-jars/
 
 jars/
+
+# Eclipse #
+.project
+.settings/
